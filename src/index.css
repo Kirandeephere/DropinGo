@@ -14,6 +14,7 @@ body {
   display: flex;
   gap: 2.5rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .info-panel {
@@ -49,4 +50,19 @@ body {
   border: 2px solid white;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
+}
+
+/* ✅ Mobile responsiveness */
+@media (max-width: 768px) {
+  .content-layout {
+    flex-direction: column;
+  }
+
+  .map-panel {
+    order: 2;
+  }
+
+  .info-panel {
+    order: 1;
+  }
 }
