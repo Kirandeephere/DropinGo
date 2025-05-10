@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import AddressForm from './components/AddressForm'
 import { getRouteToken, pollRouteStatus } from './services/api'
+import MapView from './components/MapView'
 
 const App = () => {
   const [token, setToken] = useState(null)
@@ -35,27 +36,37 @@ const App = () => {
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>DropinGo - Pin It. Drop It. Go.</h1>
-      <AddressForm onSubmit={handleFormSubmit} />
+    <div className="app-container">
+      <h1>DropinGo – Pin It. Drop It. Go.</h1>
 
-      {loading && <p>Loading token...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {token && <p><strong>Token:</strong> {token}</p>}
-      {routeData && (
-        <div>
-          <h3>Route Info:</h3>
-          <p><strong>Distance:</strong> {routeData.total_distance}</p>
-          <p><strong>Time:</strong> {routeData.total_time}</p>
-          <h4>Waypoints:</h4>
-          <ol>
-            {routeData.path.map(([lat, lng], idx) => (
-              <li key={idx}>{lat}, {lng}</li>
-            ))}
-          </ol>
+      <div className="content-layout">
+        {/* Left panel */}
+        <div className="info-panel">
+          <AddressForm onSubmit={handleFormSubmit} />
+
+          {loading && <p>Loading token...</p>}
+          {error && <p className="error">{error}</p>}
+          {token && <p><strong>Token:</strong> {token}</p>}
+          {routeData && (
+            <div>
+              <h3>Route Info:</h3>
+              <p><strong>Distance:</strong> {routeData.total_distance}</p>
+              <p><strong>Time:</strong> {routeData.total_time}</p>
+              <h4>Waypoints:</h4>
+              <ol>
+                {routeData.path.map(([lat, lng], idx) => (
+                  <li key={idx}>{lat}, {lng}</li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
-      )}
 
+        {/* Right panel */}
+        <div className="map-panel">
+          <MapView waypoints={routeData?.path || []} />
+        </div>
+      </div>
     </div>
   )
 }

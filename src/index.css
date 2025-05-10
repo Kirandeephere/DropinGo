@@ -3,3 +3,50 @@ body {
   font-family: system-ui, sans-serif;
   background: #f9f9f9;
 }
+
+.app-container {
+  padding: 2rem;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.content-layout {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 1rem;
+}
+
+.info-panel {
+  flex: 1;
+}
+
+.map-panel {
+  flex: 1.5;
+}
+
+.map-container {
+  height: 400px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.error {
+  color: red;
+}
+
+.custom-marker {
+  background-color: #3b82f6;
+  color: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: 50%;
+  font-size: 14px;
+  border: 2px solid white;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
