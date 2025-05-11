@@ -1,49 +1,54 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
+import { Autocomplete } from '@react-google-maps/api'
 
-// Form for entering origin and destination addresses
 const AddressForm = ({ onSubmit }) => {
-  const [origin, setOrigin] = useState('')
-  const [destination, setDestination] = useState('')
   const [error, setError] = useState('')
 
-  // Handles form submission and basic validation
+  const originRef = useRef(null)
+  const destinationRef = useRef(null)
+
   const handleSubmit = (e) => {
     e.preventDefault()
+    const origin = originRef.current?.value || ''
+    const destination = destinationRef.current?.value || ''
+
     if (!origin.trim() || !destination.trim()) {
       setError('Both addresses are required.')
       return
     }
+
     setError('')
     onSubmit({ origin, destination })
   }
 
   return (
     <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>
-      {/* Pickup address input */}
+      {/* Pickup address input with Google Autocomplete */}
       <div>
         <label>Pickup Address:</label>
-        <input
-          type="text"
-          value={origin}
-          onChange={(e) => setOrigin(e.target.value)}
-          placeholder="e.g. Innocentre, Hong Kong"
-          style={{ display: 'block', width: '100%', marginBottom: '1rem' }}
-        />
+        <Autocomplete>
+          <input
+            type="text"
+            ref={originRef}
+            placeholder="e.g. Innocentre, Hong Kong"
+            style={{ display: 'block', width: '100%', marginBottom: '1rem' }}
+          />
+        </Autocomplete>
       </div>
 
-      {/* Drop-off address input */}
+      {/* Drop-off address input with Google Autocomplete */}
       <div>
         <label>Drop-off Address:</label>
-        <input
-          type="text"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          placeholder="e.g. Hong Kong International Airport Terminal 1"
-          style={{ display: 'block', width: '100%', marginBottom: '1rem' }}
-        />
+        <Autocomplete>
+          <input
+            type="text"
+            ref={destinationRef}
+            placeholder="e.g. Hong Kong International Airport Terminal 1"
+            style={{ display: 'block', width: '100%', marginBottom: '1rem' }}
+          />
+        </Autocomplete>
       </div>
 
-      {/* Display validation error if any */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <button type="submit">Get Route</button>
