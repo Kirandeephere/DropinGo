@@ -3,37 +3,57 @@ import AddressForm from "./components/AddressForm";
 import { getRouteToken, pollRouteStatus } from "./services/api";
 import MapView from "./components/MapView";
 import { LoadScript } from "@react-google-maps/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [routeData, setRouteData] = useState(null);
+  const [abortController, setAbortController] = useState(null);
 
   const handleFormSubmit = async ({ origin, destination }) => {
+    const controller = new AbortController();
+    setAbortController(controller);
+
     setLoading(true);
-    setError(null);
     setToken(null);
     setRouteData(null);
 
     try {
-      // Step 1: Get token using origin and destination addresse
-      const resultToken = await getRouteToken(origin, destination);
+      const resultToken = await getRouteToken(origin, destination, controller.signal);
       setToken(resultToken);
 
-      // Step 2: Poll the API using the token to get the final route result
-      const route = await pollRouteStatus(resultToken);
+      const route = await pollRouteStatus(resultToken, controller.signal);
       setRouteData(route);
 
-      // Log the route data for debugging
       console.log("Route data:", route);
     } catch (err) {
-      // Handle any errors from the API calls
-      setError(err.message || "Something went wrong");
+      if (err.name === 'AbortError') {
+        console.log('Request was aborted');
+        toast.info(" Route request canceled.");
+      } else if (err.message.includes("Location not accessible")) {
+        toast.error(" The destination is not accessible by car.");
+      } else if (err.message.includes("Server error")) {
+        toast.error(" A server error occurred. Please try again later.");
+      } else if (err.message.includes("Max retries")) {
+        toast.error(" Unable to get route. Please try again in a moment.");
+      } else {
+        toast.error(" Something went wrong. Please try again later.");
+      }
     } finally {
-      // Hide loading state regardless of success or failure
       setLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    if (abortController) {
+      abortController.abort();
+    }
+
+    setLoading(false);
+    setToken(null);
+    setRouteData(null);
   };
 
   return (
@@ -47,32 +67,36 @@ const App = () => {
         <div className="content-layout">
           {/* Left panel */}
           <div className="info-panel">
-            <AddressForm onSubmit={handleFormSubmit} />
+            <AddressForm onSubmit={handleFormSubmit} onCancel={handleCancel} isSubmitting={loading} />
 
-            {loading && <p>Loading token...</p>}
-            {error && <p className="error">{error}</p>}
-            {token && (
-              <p>
-                <strong>Token:</strong> {token}
-              </p>
+            {loading && (
+              <div className="loading-container">
+                <p className="loading-text">
+                  Planning route
+                  <span className="animated-dots">
+                    <span>.</span>
+                    <span>.</span>
+                    <span>.</span>
+                  </span>
+                </p>
+              </div>
             )}
+
             {routeData && (
-              <div>
-                <h3>Route Info:</h3>
-                <p>
-                  <strong>Distance:</strong> {routeData.total_distance}
-                </p>
-                <p>
-                  <strong>Time:</strong> {routeData.total_time}
-                </p>
-                <h4>Waypoints:</h4>
-                <ol>
-                  {routeData.path.map(([lat, lng], idx) => (
-                    <li key={idx}>
-                      {lat}, {lng}
-                    </li>
-                  ))}
-                </ol>
+              <div className="route-info">
+                <p>Route Information: </p>
+                <div className="summary-item">
+                  <span className="summary-label">📏 Distance: </span>
+                  <span className="summary-value">
+                    {(routeData.total_distance / 1000).toFixed(1)} km
+                  </span>
+                </div>
+                <div className="summary-item">
+                  <span className="summary-label">🕒 Estimated Time: </span>
+                  <span className="summary-value">
+                    {Math.round(routeData.total_time / 60)} mins
+                  </span>
+                </div>
               </div>
             )}
           </div>
@@ -82,6 +106,9 @@ const App = () => {
             <MapView waypoints={routeData?.path || []} />
           </div>
         </div>
+
+        {/* Toast container for user notifications */}
+        <ToastContainer position="top-right" autoClose={5000} />
       </div>
     </LoadScript>
   );

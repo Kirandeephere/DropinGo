@@ -1,13 +1,27 @@
+/* ========================================
+🌐 Global Styles
+======================================== */
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: "Segoe UI", Roboto, system-ui, sans-serif;
   background: #f9f9f9;
+  color: #333;
 }
 
+/* ========================================
+📦 App Container & Layout
+======================================== */
 .app-container {
   padding: 2rem;
   max-width: 90%;
   margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 1.5rem;
 }
 
 .content-layout {
@@ -23,19 +37,146 @@ body {
 
 .map-panel {
   flex: 1.5;
+  height: 500px;
 }
 
+/* ========================================
+📝 Form Styling
+======================================== */
+form {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+form input[type="text"] {
+  width: 95%;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 1.25rem;
+  transition: border-color 0.2s ease;
+}
+
+
+form button {
+  padding: 0.6rem 1.2rem;
+  background-color: #3b82f6;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+form button:hover {
+  background-color: #2563eb;
+}
+
+/* ========================================
+⚠️ Error Message
+======================================== */
+.error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* ========================================
+⏳ Loading Animation (Dots)
+======================================== */
+.loading-container {
+  margin-top: 1.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  color: #444;
+}
+
+.animated-dots {
+  display: inline-flex;
+  margin-left: 4px;
+}
+
+.animated-dots span {
+  animation: bounce 1.4s infinite;
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-right: 2px;
+  color: #3b82f6;
+}
+
+.animated-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.animated-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+}
+
+/* ========================================
+📋 Route Info Display
+======================================== */
+.route-info {
+  margin-top: 2rem;
+  background: #fff;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+}
+
+.summary-label {
+  font-weight: 500;
+  color: #444;
+}
+
+.summary-value {
+  font-weight: 700;
+  color: #111;
+}
+
+/* ========================================
+🗺️ Mapbox Map Styles
+======================================== */
 .map-container {
   height: 400px;
   width: 100%;
   border: 1px solid #ccc;
   border-radius: 8px;
+  position: relative;
+  z-index: 1;
 }
 
-.error {
-  color: red;
-}
-
+/* Mapbox custom marker */
 .custom-marker {
   background-color: #3b82f6;
   color: white;
@@ -52,7 +193,9 @@ body {
   cursor: pointer;
 }
 
-/* ✅ Mobile responsiveness */
+/* ========================================
+📱 Mobile Responsiveness
+======================================== */
 @media (max-width: 768px) {
   .content-layout {
     flex-direction: column;
@@ -65,4 +208,102 @@ body {
   .info-panel {
     order: 1;
   }
+
+  .map-container {
+    height: 300px;
+  }
+}
+
+/* ========================================
+📦 Button Styles
+======================================== */
+button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+}
+
+/* ========================================
+✅ Get Route Button Styles
+======================================== */
+.get-route-btn {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.get-route-btn:hover {
+  background-color: #2563eb;
+}
+
+.get-route-btn:disabled {
+  background-color: #b0c7e7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+
+/* Container for buttons */
+.button-container {
+  display: flex;
+  gap: 1rem; /* Adds spacing between the buttons */
+}
+
+/* Common button styles */
+button {
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Submit Button */
+button[type="submit"] {
+  background-color: #4CAF50; /* Green for 'Get Route' */
+  color: white;
+}
+
+button[type="submit"]:hover {
+  background-color: #45a049; /* Darker green for hover */
+}
+
+button[type="submit"]:disabled {
+  background-color: #d3d3d3; /* Grey when disabled */
+  cursor: not-allowed;
+}
+
+/* Reset/Cancel Button */
+button[type="button"] {
+  background-color: #f44336; /* Red for 'Reset' / 'Cancel' */
+  color: white;
+}
+
+button[type="button"]:hover {
+  background-color: #e53935; /* Darker red for hover */
+}
+
+button[type="button"]:disabled {
+  background-color: #d3d3d3; /* Grey when disabled */
+  cursor: not-allowed;
+}
+
+/* Add some focus effects for accessibility */
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.75); /* Focus ring */
+}
+
+button:active {
+  transform: scale(0.98); /* Button shrink effect on click */
+}
+
+.Toastify__toast {
+  width: 400px !important;              
+  margin: 0 auto;               
+  word-break: break-word;
 }

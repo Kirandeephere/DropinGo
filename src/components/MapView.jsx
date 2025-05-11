@@ -7,8 +7,8 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 const MapView = ({ waypoints }) => {
   const mapContainerRef = useRef(null)
   const map = useRef(null)
+  const currentPopup = useRef(null)  // Reference to store the current popup
 
-  // Helper: Fetch driving route with curved roads
   const fetchRoute = async (coords) => {
     const coordString = coords.map(([lat, lng]) => `${lng},${lat}`).join(';')
     const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordString}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`
@@ -24,63 +24,88 @@ const MapView = ({ waypoints }) => {
       return
     }
 
-    // Initialize map once
     if (!map.current) {
       map.current = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [114.15769, 22.28552], // Default center: HK
-        zoom: 11
+        center: [114.15769, 22.28552],
+        zoom: 12
       })
     }
 
-    // Draw markers and route
     if (waypoints?.length) {
       map.current.once('load', async () => {
-        // Clear old markers and route
-        map.current?.getStyle().layers?.forEach(layer => {
-          if (layer.id === 'route-line') {
-            if (map.current.getLayer('route-line')) map.current.removeLayer('route-line')
-            if (map.current.getSource('route')) map.current.removeSource('route')
-          }
-        })
+        // Clean up existing route if any
+        if (map.current.getLayer('route-line')) {
+          map.current.removeLayer('route-line')
+        }
+        if (map.current.getSource('route')) {
+          map.current.removeSource('route')
+        }
 
+        // Remove existing markers (optional, if you manage them)
+        document.querySelectorAll('.custom-marker').forEach(el => el.remove())
+
+        // Add markers
         const bounds = new mapboxgl.LngLatBounds()
 
-      waypoints.forEach(([lat, lng], idx) => {
-        // Custom numbered marker
-        const el = document.createElement('div')
-        el.className = 'custom-marker'
-        el.textContent = `${idx + 1}`
+        waypoints.forEach(([lat, lng], idx) => {
+          const el = document.createElement('div')
+          el.className = 'custom-marker'
+          el.textContent = `${idx + 1}`
 
-        // Smarter popup label
-        const popupLabel = 
-          idx === 0
-            ? 'Origin'
-            : idx === waypoints.length - 1
-            ? 'Destination'
-            : `Stop ${idx}`
+          const marker = new mapboxgl.Marker(el)
+            .setLngLat([lng, lat])
+            .addTo(map.current)
 
-        new mapboxgl.Marker(el)
-          .setLngLat([lng, lat])
-          .setPopup(new mapboxgl.Popup().setText(popupLabel))
-          .addTo(map.current)
+          bounds.extend([lng, lat])
 
-        bounds.extend([lng, lat])
-      })
+          // Show coordinates on hover
+          marker.getElement().addEventListener('mouseenter', () => {
+            if (currentPopup.current) {
+              currentPopup.current.remove()  // Remove previous popup if any
+            }
 
-        // Fit bounds to all points
+            // Ensure lng and lat are numbers
+  const lngNumber = Number(lng);
+  const latNumber = Number(lat);
+
+            const popup = new mapboxgl.Popup({ 
+              offset: 25,
+              closeButton: false 
+            })
+              .setLngLat([lng, lat])
+              .setHTML(`<p>Coordinates: ${lngNumber.toFixed(4)}, ${latNumber.toFixed(4)}</p>`)
+              .addTo(map.current)
+
+            currentPopup.current = popup  // Store the current popup reference
+          })
+
+          marker.getElement().addEventListener('mouseleave', () => {
+            if (currentPopup.current) {
+              currentPopup.current.remove()  // Remove the popup when mouse leaves
+              currentPopup.current = null  // Reset the popup reference
+            }
+          })
+        })
+
         map.current.fitBounds(bounds, { padding: 60 })
 
-        // Draw the driving route
+        // Fetch and animate route
         const geometry = await fetchRoute(waypoints)
         if (geometry) {
+          const routeCoords = geometry.coordinates
+          const animatedRoute = {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: []
+            }
+          }
+
           map.current.addSource('route', {
             type: 'geojson',
-            data: {
-              type: 'Feature',
-              geometry
-            }
+            data: animatedRoute
           })
 
           map.current.addLayer({
@@ -96,6 +121,21 @@ const MapView = ({ waypoints }) => {
               'line-width': 4
             }
           })
+
+          // Animate line drawing
+          let i = 0
+          const drawSpeed = 15 // milliseconds between points
+
+          const animateLine = () => {
+            if (i < routeCoords.length) {
+              animatedRoute.geometry.coordinates.push(routeCoords[i])
+              map.current.getSource('route').setData(animatedRoute)
+              i++
+              setTimeout(animateLine, drawSpeed)
+            }
+          }
+
+          animateLine()
         }
       })
     }
@@ -106,7 +146,7 @@ const MapView = ({ waypoints }) => {
     }
   }, [waypoints])
 
-  return <div ref={mapContainerRef} className="map-container" />
+  return <div ref={mapContainerRef} className="map-container"/>
 }
 
 export default MapView
