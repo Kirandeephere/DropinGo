@@ -21,7 +21,11 @@ const App = () => {
     setRouteData(null);
 
     try {
-      const resultToken = await getRouteToken(origin, destination, controller.signal);
+      const resultToken = await getRouteToken(
+        origin,
+        destination,
+        controller.signal
+      );
       setToken(resultToken);
 
       const route = await pollRouteStatus(resultToken, controller.signal);
@@ -29,8 +33,8 @@ const App = () => {
 
       console.log("Route data:", route);
     } catch (err) {
-      if (err.name === 'AbortError') {
-        console.log('Request was aborted');
+      if (err.name === "AbortError") {
+        console.log("Request was aborted");
         toast.info(" Route request canceled.");
       } else if (err.message.includes("Location not accessible")) {
         toast.error(" The destination is not accessible by car.");
@@ -67,7 +71,11 @@ const App = () => {
         <div className="content-layout">
           {/* Left panel */}
           <div className="info-panel">
-            <AddressForm onSubmit={handleFormSubmit} onCancel={handleCancel} isSubmitting={loading} />
+            <AddressForm
+              onSubmit={handleFormSubmit}
+              onCancel={handleCancel}
+              isSubmitting={loading}
+            />
 
             {loading && (
               <div className="loading-container">

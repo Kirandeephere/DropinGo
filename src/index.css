@@ -68,7 +68,6 @@ form input[type="text"] {
   transition: border-color 0.2s ease;
 }
 
-
 form button {
   padding: 0.6rem 1.2rem;
   background-color: #3b82f6;
@@ -127,7 +126,9 @@ form button:hover {
 }
 
 @keyframes bounce {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
@@ -244,7 +245,6 @@ button {
   opacity: 0.6;
 }
 
-
 /* Container for buttons */
 .button-container {
   display: flex;
@@ -264,7 +264,7 @@ button {
 
 /* Submit Button */
 button[type="submit"] {
-  background-color: #4CAF50; /* Green for 'Get Route' */
+  background-color: #4caf50; /* Green for 'Get Route' */
   color: white;
 }
 
@@ -303,7 +303,7 @@ button:active {
 }
 
 .Toastify__toast {
-  width: 400px !important;              
-  margin: 0 auto;               
+  width: 400px !important;
+  margin: 0 auto;
   word-break: break-word;
 }
